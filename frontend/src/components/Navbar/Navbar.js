@@ -15,7 +15,7 @@ const Navbar = () => {
         {/* User Profile */}
         <div className="user-profile">
           <img
-            src="https://i.pravatar.cc/40"
+            src="https://2017.lutheranworld.org/sites/default/files/styles/large_updates_image/public/updates/1B_humans_not_for_sale.jpg?itok=IkUtnG_I"
             alt="Profile"
             className="profile-pic"
           />
@@ -26,7 +26,7 @@ const Navbar = () => {
         </div>
 
         {/* Logout Button */}
-        <button className="logout-button">Logout</button>
+        {/* <button className="logout-button">Logout</button> */}
       </div>
     </div>
   );
