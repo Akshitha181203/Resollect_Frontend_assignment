@@ -1,44 +1,32 @@
 import React, { useState } from "react";
 import "./Portfolio.css";
 import UploadDocument from "../UploadDocument/UploadDocument";
+import loanData from "../../Data/loanData.js"; // 🔗 50-loan data file
 
 const filtersList = [
-  "All", "Pre Sarfaesi", "NPA", "13(2) Responses", "Symbolic Possession",
-  "DM Order", "Physical Possessions", "Auctions"
-];
-
-const initialLoans = [
-  {
-    id: "L28U3247",
-    type: "Home Loan",
-    borrower: "Vedika Sachar",
-    address: "83 Yogi Ganj, Kadapa-058270",
-    coName: "Divit Vora",
-    coAddress: "24/543, Acharya Path, Ongole",
-    dpd: 91,
-    amount: "₹ 1934068",
-    region: "West",
-    status: "Updated",
-  },
-  {
-    id: "L28U3243",
-    type: "Car Loan",
-    borrower: "Hrishita Agrawal",
-    address: "86/622 Deo Path, Berhampore",
-    coName: "Mahika Tak",
-    coAddress: "58 Tella Road, Sultan Pur",
-    dpd: 100,
-    amount: "₹ 1842143",
-    region: "North",
-    status: "Missing",
-  },
+  "All",
+  "Pre Sarfaesi",
+  "NPA",
+  "13(2) Responses",
+  "Symbolic Possession",
+  "DM Order",
+  "Physical Possessions",
+  "Auctions",
 ];
 
 const Portfolio = () => {
+  const [loans] = useState(loanData);
   const [showUpload, setShowUpload] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState(["All"]);
-  const [loans, setLoans] = useState(initialLoans);
   const [selectedLoanIds, setSelectedLoanIds] = useState([]);
+
+  // ✅ Pagination Logic
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentLoans = loans.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(loans.length / itemsPerPage);
 
   const toggleFilter = (filter) => {
     if (filter === "All") {
@@ -58,12 +46,15 @@ const Portfolio = () => {
   };
 
   const toggleSelectAll = (checked) => {
+    const visibleIds = currentLoans.map((loan) => loan.id);
     if (checked) {
-      setSelectedLoanIds(loans.map((loan) => loan.id));
+      setSelectedLoanIds((prev) => [...new Set([...prev, ...visibleIds])]);
     } else {
-      setSelectedLoanIds([]);
+      setSelectedLoanIds((prev) => prev.filter((id) => !visibleIds.includes(id)));
     }
   };
+
+  const isPageFullySelected = currentLoans.every((loan) => selectedLoanIds.includes(loan.id));
 
   return (
     <div className="portfolio-container">
@@ -123,7 +114,7 @@ const Portfolio = () => {
             <th>
               <input
                 type="checkbox"
-                checked={selectedLoanIds.length === loans.length}
+                checked={isPageFullySelected}
                 onChange={(e) => toggleSelectAll(e.target.checked)}
               />
             </th>
@@ -140,7 +131,7 @@ const Portfolio = () => {
           </tr>
         </thead>
         <tbody>
-          {loans.map((loan) => (
+          {currentLoans.map((loan) => (
             <tr key={loan.id}>
               <td>
                 <input
@@ -163,6 +154,29 @@ const Portfolio = () => {
           ))}
         </tbody>
       </table>
+
+      {/* Pagination Footer */}
+      <div className="portfolio-footer">
+        <span>
+          Showing {indexOfFirstItem + 1}–{Math.min(indexOfLastItem, loans.length)} of {loans.length} results
+        </span>
+        <div className="pagination-controls">
+          <button
+            className="pagination-btn"
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </button>
+          <button
+            className="pagination-btn"
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
