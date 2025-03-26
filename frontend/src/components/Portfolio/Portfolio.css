@@ -195,3 +195,9 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+.pagination-btn.active-page {
+  background-color: #226ddd;
+  color: white;
+  font-weight: bold;
+}

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./Portfolio.css";
 import UploadDocument from "../UploadDocument/UploadDocument";
-import loanData from "../../Data/loanData.js"; // 🔗 50-loan data file
+import loanData from "../../Data/loanData.js";
 
 const filtersList = [
   "All",
@@ -19,14 +19,20 @@ const Portfolio = () => {
   const [showUpload, setShowUpload] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState(["All"]);
   const [selectedLoanIds, setSelectedLoanIds] = useState([]);
-
-  // ✅ Pagination Logic
+  const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+
+  // 🔍 Filtered loans based on search
+  const filteredLoans = loans.filter((loan) =>
+    loan.id.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const totalPages = Math.ceil(filteredLoans.length / itemsPerPage);
+  const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentLoans = loans.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(loans.length / itemsPerPage);
+  const currentLoans = filteredLoans.slice(indexOfFirstItem, indexOfLastItem);
 
   const toggleFilter = (filter) => {
     if (filter === "All") {
@@ -54,7 +60,9 @@ const Portfolio = () => {
     }
   };
 
-  const isPageFullySelected = currentLoans.every((loan) => selectedLoanIds.includes(loan.id));
+  const isPageFullySelected = currentLoans.every((loan) =>
+    selectedLoanIds.includes(loan.id)
+  );
 
   return (
     <div className="portfolio-container">
@@ -78,7 +86,15 @@ const Portfolio = () => {
 
       {/* Search & Buttons Row */}
       <div className="search-controls">
-        <input className="search-loan" placeholder="Search Loan Number" />
+        <input
+          className="search-loan"
+          placeholder="Search Loan Number"
+          value={searchQuery}
+          onChange={(e) => {
+            setSearchQuery(e.target.value);
+            setCurrentPage(1); // reset to page 1 on search
+          }}
+        />
         <div className="right-buttons">
           <button className="btn-outline">Select Columns ▼</button>
           <button className="btn-outline-morefilter" onClick={() => setShowUpload(true)}>
@@ -158,7 +174,8 @@ const Portfolio = () => {
       {/* Pagination Footer */}
       <div className="portfolio-footer">
         <span>
-          Showing {indexOfFirstItem + 1}–{Math.min(indexOfLastItem, loans.length)} of {loans.length} results
+          Showing {indexOfFirstItem + 1}–
+          {Math.min(indexOfLastItem, filteredLoans.length)} of {filteredLoans.length} results
         </span>
         <div className="pagination-controls">
           <button
@@ -168,6 +185,17 @@ const Portfolio = () => {
           >
             Previous
           </button>
+
+          {pages.map((num) => (
+            <button
+              key={num}
+              className={`pagination-btn ${currentPage === num ? "active-page" : ""}`}
+              onClick={() => setCurrentPage(num)}
+            >
+              {num}
+            </button>
+          ))}
+
           <button
             className="pagination-btn"
             onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
