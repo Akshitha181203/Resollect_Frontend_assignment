@@ -67,11 +67,9 @@ const Portfolio = () => {
 
   return (
     <div className="portfolio-container">
+      {/* Header */}
       <div className="portfolio-header">
         <h2>Portfolio</h2>
-        <button className="upload-btn" onClick={() => setShowUpload(true)}>
-          Upload Document
-        </button>
       </div>
 
       {/* Filters */}
@@ -87,12 +85,14 @@ const Portfolio = () => {
         ))}
       </div>
 
-      {/* Search and Buttons */}
+      {/* Search & Buttons Row */}
       <div className="search-controls">
         <input className="search-loan" placeholder="Search Loan Number" />
         <div className="right-buttons">
           <button className="btn-outline">Select Columns ▼</button>
-          <button className="btn-outline">More Filters</button>
+          <button className="btn-outline-morefilter" onClick={() => setShowUpload(true)}>
+            More Filters
+          </button>
         </div>
       </div>
 
@@ -104,19 +104,16 @@ const Portfolio = () => {
         >
           Generate Pre Sarfaesi Notice
         </button>
-
         <button
           className={`action-btn ${selectedLoanIds.length > 0 ? "enabled" : "disabled"}`}
           disabled={selectedLoanIds.length === 0}
         >
           Declare NPA ({selectedLoanIds.length})
         </button>
-
-        <span className="loan-count-right">
-          {selectedLoanIds.length} loans selected
-        </span>
+        <span className="loan-count-right">{selectedLoanIds.length} loans selected</span>
       </div>
 
+      {/* Upload Modal */}
       {showUpload && <UploadDocument onClose={() => setShowUpload(false)} />}
 
       {/* Table */}
